@@ -22,5 +22,4 @@ abstract class BaseSampler(ctx: Context, samplerScope: CoroutineScope) {
 
     //internal configuration that will run whenever
     //we start the sampler.
-    protected abstract suspend fun configureSampler()
 }

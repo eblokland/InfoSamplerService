@@ -38,7 +38,7 @@ abstract class PollingSampler<T>(ctx: Context, samplerScope: CoroutineScope) : B
         }
     }
 
-    override suspend fun configureSampler(){
+    protected open suspend fun configureSampler(){
         Log.d(TAG, "configuring polling sampler")
         estimatedUpdateRate = estimateUpdateRateAvg(funToSample)
         updateRate = ((estimatedUpdateRate / (samplesPerUpdate).toDouble()).toDuration(DurationUnit.MILLISECONDS))

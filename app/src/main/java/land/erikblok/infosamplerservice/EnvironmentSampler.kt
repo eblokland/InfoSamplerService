@@ -10,6 +10,7 @@ import land.erikblok.infosamplerservice.sampler.LogReceivers.LogFileWriter
 import land.erikblok.infosamplerservice.sampler.LogReceivers.LogcatWriter
 import land.erikblok.infosamplerservice.sampler.Samplers.BaseSampler
 import land.erikblok.infosamplerservice.sampler.Samplers.CurrentSampler
+import land.erikblok.infosamplerservice.sampler.Samplers.VoltageSampler
 
 class EnvironmentSampler : Service() {
 
@@ -58,6 +59,7 @@ class EnvironmentSampler : Service() {
 
     private fun setupSamplers(set: MutableSet<BaseSampler>) {
         set.add(CurrentSampler(this, serviceScope)) //pass context of service to sampler, make sure this is not called before onStart
+        set.add(VoltageSampler(this, serviceScope))
     }
 
     private fun runFileLogger(startId: Int): Boolean {
