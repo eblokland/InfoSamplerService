@@ -25,6 +25,8 @@ class EnvironmentSampler : Service() {
 
     private lateinit var textLoggerScope: CoroutineScope
     private lateinit var logcatLoggerScope: CoroutineScope
+    private val serviceScope : CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default) //scope for running the samplers, etc.  Will be kept alive until the service is killed.
+
 
     override fun onCreate() {
         Log.i(TAG, "called oncreate")
@@ -46,6 +48,7 @@ class EnvironmentSampler : Service() {
         if (this::fileWriter.isInitialized) fileWriter.onDestroy()
         textLoggerScope.cancel()
         logcatLoggerScope.cancel()
+        serviceScope.cancel()
     }
 
 
@@ -54,7 +57,7 @@ class EnvironmentSampler : Service() {
     }
 
     private fun setupSamplers(set: MutableSet<BaseSampler>) {
-        set.add(CurrentSampler(this)) //pass context of service to sampler, make sure this is not called before onStart
+        set.add(CurrentSampler(this, serviceScope)) //pass context of service to sampler, make sure this is not called before onStart
     }
 
     private fun runFileLogger(startId: Int): Boolean {

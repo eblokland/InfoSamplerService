@@ -4,12 +4,15 @@ import android.content.Context
 import android.content.Context.BATTERY_SERVICE
 import android.os.BatteryManager
 import android.os.SystemClock
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import land.erikblok.infosamplerservice.sampler.Logs.CurrentLog
 import land.erikblok.infosamplerservice.sampler.Logs.SamplerLog
 import land.erikblok.infosamplerservice.sampler.Logs.VoltageLog
 
-class CurrentSampler(ctx: Context) : PollingSampler<Int>(ctx) {
+class CurrentSampler(ctx: Context, samplerScope: CoroutineScope) : PollingSampler<Int>(ctx,
+    samplerScope
+) {
 
     private var batteryManager : BatteryManager
     override lateinit var funToSample : () -> Int
