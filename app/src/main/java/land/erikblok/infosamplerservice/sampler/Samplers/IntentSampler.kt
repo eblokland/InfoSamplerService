@@ -15,15 +15,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import land.erikblok.infosamplerservice.sampler.Logs.SamplerLog
 import land.erikblok.infosamplerservice.sampler.Logs.VoltageLog
+import java.util.concurrent.locks.Lock
 
 private val TAG = "INTENT_SAMPLER"
-abstract class IntentSampler(ctx: Context, samplerScope: CoroutineScope) : BaseSampler(ctx, samplerScope) {
 
-    protected abstract val intentFilter : IntentFilter
+abstract class IntentSampler(ctx: Context, samplerScope: CoroutineScope) :
+    BaseSampler(ctx, samplerScope), DestructableSampler {
+
+    protected abstract val intentFilter: IntentFilter
+
+    private var br: BroadcastReceiver? = null
 
 
     override val logSource: Flow<SamplerLog> = callbackFlow {
-        val broadcastReceiver = object : BroadcastReceiver() {
+        br = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 intent?.let {
                     trySendBlocking(
@@ -32,9 +37,34 @@ abstract class IntentSampler(ctx: Context, samplerScope: CoroutineScope) : BaseS
                 }
             }
         }
-        ctx.registerReceiver(broadcastReceiver, intentFilter)
-        awaitClose {ctx.unregisterReceiver(broadcastReceiver)}
+        ctx.registerReceiver(br, intentFilter)
+
+        awaitClose {
+            unregisterReceiver()
+        }
     }
 
-    protected abstract fun createLog(intent : Intent) : SamplerLog
+    override fun onDestroy() {
+       unregisterReceiver()
+    }
+
+    private fun unregisterReceiver(){
+            //this might get double-called depending on the race condition with destruction.
+            synchronized(this) {
+                if (br != null) {
+                    Log.d(TAG, "Unregistering")
+                    try {
+                        ctx.unregisterReceiver(br)
+                        br = null
+                        Log.d(TAG, "Unregistered")
+                    } catch (e: IllegalArgumentException) {
+                        Log.d(TAG, "threw from unregisterReceiver", e)
+                    }
+                }
+            }
+    }
+
+
+
+    protected abstract fun createLog(intent: Intent): SamplerLog
 }

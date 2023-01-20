@@ -1,6 +1,7 @@
 package land.erikblok.infosamplerservice
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
@@ -8,9 +9,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import land.erikblok.infosamplerservice.sampler.LogReceivers.LogFileWriter
 import land.erikblok.infosamplerservice.sampler.LogReceivers.LogcatWriter
-import land.erikblok.infosamplerservice.sampler.Samplers.BaseSampler
-import land.erikblok.infosamplerservice.sampler.Samplers.CurrentSampler
-import land.erikblok.infosamplerservice.sampler.Samplers.VoltageSampler
+import land.erikblok.infosamplerservice.sampler.Samplers.*
 
 class EnvironmentSampler : Service() {
 
@@ -27,7 +26,6 @@ class EnvironmentSampler : Service() {
     private lateinit var textLoggerScope: CoroutineScope
     private lateinit var logcatLoggerScope: CoroutineScope
     private val serviceScope : CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default) //scope for running the samplers, etc.  Will be kept alive until the service is killed.
-
 
     override fun onCreate() {
         Log.i(TAG, "called oncreate")
@@ -50,6 +48,9 @@ class EnvironmentSampler : Service() {
         textLoggerScope.cancel()
         logcatLoggerScope.cancel()
         serviceScope.cancel()
+        //manually destroy samplers because we have no guarantee that cancel runs before the service is destroyed :(
+        samplers.forEach {if (it is DestructableSampler) it.onDestroy()}
+        super.onDestroy()
     }
 
 
@@ -60,6 +61,7 @@ class EnvironmentSampler : Service() {
     private fun setupSamplers(set: MutableSet<BaseSampler>) {
         set.add(CurrentSampler(this, serviceScope)) //pass context of service to sampler, make sure this is not called before onStart
         set.add(VoltageSampler(this, serviceScope))
+        set.add(DisplayManagerSampler(this, serviceScope))
     }
 
     private fun runFileLogger(startId: Int): Boolean {
