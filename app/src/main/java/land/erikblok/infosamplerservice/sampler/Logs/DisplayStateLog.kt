@@ -5,7 +5,7 @@ import android.view.Display
 class DisplayStateLog(timestamp: Long, private val state : Int, private val displayId : Int) : SamplerLog(timestamp) {
 
     override fun toString(): String {
-        return "${super.toString()}, display $displayId state ${stateToString(state)}"
+        return "${super.toString()}, ${getData()}"
     }
 
     private fun stateToString(state:Int) : String{
@@ -17,5 +17,9 @@ class DisplayStateLog(timestamp: Long, private val state : Int, private val disp
             Display.STATE_UNKNOWN -> "unknown"
             else -> "invalid"
         }
+    }
+
+    override fun getData(): String {
+        return "Display $displayId state ${stateToString(state)}"
     }
 }

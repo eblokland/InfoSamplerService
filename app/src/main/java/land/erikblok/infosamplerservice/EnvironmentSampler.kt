@@ -28,7 +28,7 @@ class EnvironmentSampler : Service() {
     private val serviceScope : CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default) //scope for running the samplers, etc.  Will be kept alive until the service is killed.
 
     override fun onCreate() {
-        Log.i(TAG, "called oncreate")
+        Log.d(TAG, "called oncreate")
         samplers = LinkedHashSet()
         setupSamplers(samplers)
         textLoggerScope =
@@ -48,6 +48,7 @@ class EnvironmentSampler : Service() {
         textLoggerScope.cancel()
         logcatLoggerScope.cancel()
         serviceScope.cancel()
+        this.
         //manually destroy samplers because we have no guarantee that cancel runs before the service is destroyed :(
         samplers.forEach {if (it is DestructableSampler) it.onDestroy()}
         super.onDestroy()
