@@ -33,9 +33,8 @@ abstract class PollingSampler<T>(ctx: Context, samplerScope: CoroutineScope) : B
         }
         while (true) {
             val latest = funToSample()
-            Log.d(TAG, "Running sampler")
             if (latest != lastSample) {
-                var log = createLog(latest)
+                val log = createLog(latest)
                 emit(log)
                 lastSample = latest
             }

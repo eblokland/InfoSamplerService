@@ -1,9 +1,13 @@
 package land.erikblok.infosamplerservice.sampler.Logs
 
-abstract class SamplerLog(val timestamp: Long){
+open class SamplerLog(val timestamp: Long){
     override fun toString() : String{
         return "Timestamp: ${timestamp} "
     }
-    abstract fun getData() : String
+    open fun getData() : String = ""
+
+    constructor() : this(-1){
+
+    }
 
 }

@@ -11,6 +11,28 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    versionCatalogs{
+        libs{
+            version('compose', '1.3.3')
+            library('core-ktx', 'androidx.core:core-ktx:1.9.0')
+            library('android-appcompat', 'androidx.appcompat:appcompat:1.6.0')
+            library('android-material', 'com.google.android.material:material:1.8.0')
+            library('androidx-constraintlayout', 'androidx.constraintlayout:constraintlayout:2.1.4')
+            library('androidx-navigation-fragment', 'androidx.navigation:navigation-fragment-ktx:2.5.3')
+            library('androidx-navigation-ui', 'androidx.navigation:navigation-ui-ktx:2.5.3')
+            library('androidx-lifecycle-runtime', 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1')
+            library('androidx-activity-compose', 'androidx.activity:activity-compose:1.6.1')
+            library('compose-ui', 'androidx.compose.ui', 'ui').versionRef('compose')
+            library('compose-ui-tooling-preview', 'androidx.compose.ui', 'ui-tooling-preview').versionRef('compose')
+            library('compose-material', 'androidx.compose.material3:material3:1.0.1')
+            bundle('compose', ['compose-ui', 'compose-ui-tooling-preview', 'compose-material'])
+        }
+        debugLibs{
+            version('compose', '1.3.3')
+            library('compose-ui-tooling', 'androidx.compose.ui', 'ui-tooling').versionRef('compose')
+            library('compose-ui-test-manifest', 'androidx.compose.ui', 'ui-test-manifest').versionRef('compose')
+        }
+    }
 }
 rootProject.name = "InfoSamplerService"
 include ':app'

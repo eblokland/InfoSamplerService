@@ -4,6 +4,8 @@ import android.view.Display
 
 class DisplayStateLog(timestamp: Long, private val state : Int, private val displayId : Int) : SamplerLog(timestamp) {
 
+    constructor() : this(-1, -1, -1)
+
     override fun toString(): String {
         return "${super.toString()}, ${getData()}"
     }
