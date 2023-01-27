@@ -182,6 +182,7 @@ class EnvironmentSampler : Service() {
         ) //pass context of service to sampler, make sure this is not called before onStart
         set.add(VoltageSampler(this, serviceScope))
         set.add(DisplayManagerSampler(this, serviceScope))
+        set.add(LteSampler(this, serviceScope))
     }
 
 
