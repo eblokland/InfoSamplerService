@@ -15,7 +15,6 @@ private val TAG = "WIFI_STR_SAMPLER"
 class WifiStrSampler(ctx: Context, samplerScope: CoroutineScope) : IntentSampler(ctx,
     samplerScope
 ) {
-    private lateinit var previousIntent : Intent
     override val intentFilter: IntentFilter = IntentFilter(RSSI_CHANGED_ACTION)
 
     override fun createLog(intent: Intent): SamplerLog? {

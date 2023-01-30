@@ -40,7 +40,6 @@ abstract class IntentSampler(ctx: Context, samplerScope: CoroutineScope) :
             }
         }
         ctx.registerReceiver(br, intentFilter)
-
         awaitClose {
             unregisterReceiver()
         }

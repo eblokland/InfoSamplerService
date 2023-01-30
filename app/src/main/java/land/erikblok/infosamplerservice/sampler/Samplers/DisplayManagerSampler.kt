@@ -60,6 +60,16 @@ class DisplayManagerSampler(ctx: Context, samplerScope: CoroutineScope) : BaseSa
 
         }
         dm.registerDisplayListener(listener, null)
+        //send initial state
+        dm.displays.forEach {
+            trySendBlocking(
+                DisplayStateLog(
+                    SystemClock.elapsedRealtimeNanos(),
+                    it.state,
+                    it.displayId
+                )
+            )
+        }
         awaitClose { dm.unregisterDisplayListener(listener) }
     }
 }

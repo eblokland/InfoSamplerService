@@ -185,6 +185,7 @@ class EnvironmentSampler : Service() {
         set.add(LteSampler(this, serviceScope))
         set.add(WifiRoamSampler(this, serviceScope))
         set.add(WifiStrSampler(this, serviceScope))
+        set.add(DisplayBrightnessSampler(this, serviceScope))
     }
 
 
