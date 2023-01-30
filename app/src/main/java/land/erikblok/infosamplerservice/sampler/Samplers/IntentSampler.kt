@@ -31,9 +31,11 @@ abstract class IntentSampler(ctx: Context, samplerScope: CoroutineScope) :
         br = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 intent?.let {
-                    trySendBlocking(
-                        createLog(it)
-                    ).onFailure { Log.d(TAG, "Failed to send intent log") }
+                    createLog(it)?.also { log ->
+                        trySendBlocking(
+                            log
+                        ).onFailure { Log.d(TAG, "Failed to send intent log") }
+                    }
                 }
             }
         }
@@ -66,5 +68,5 @@ abstract class IntentSampler(ctx: Context, samplerScope: CoroutineScope) :
 
 
 
-    protected abstract fun createLog(intent: Intent): SamplerLog
+    protected abstract fun createLog(intent: Intent): SamplerLog?
 }

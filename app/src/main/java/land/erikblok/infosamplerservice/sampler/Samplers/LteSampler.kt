@@ -27,6 +27,10 @@ class LteSampler(ctx: Context, samplerScope: CoroutineScope) : BaseSampler(ctx, 
     @Suppress("DEPRECATION") // not deprecated for target api
     override val logSource: Flow<SamplerLog> = callbackFlow {
 
+        //TODO: This works but is bad, it will leak threads everywhere.
+        //I should probably create a custom callback api that can hook into
+        //a singleton thread and then convert that into a flow
+        //There is a reason this got deprecated...
         val thread = object : Thread() {
             private lateinit var psl : PhoneStateListener
 
@@ -54,7 +58,6 @@ class LteSampler(ctx: Context, samplerScope: CoroutineScope) : BaseSampler(ctx, 
 
         thread.start()
         awaitClose{
-            //i really hope this will get garbage collected
             thread.deregister()
         }
     }

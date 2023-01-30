@@ -183,6 +183,7 @@ class EnvironmentSampler : Service() {
         set.add(VoltageSampler(this, serviceScope))
         set.add(DisplayManagerSampler(this, serviceScope))
         set.add(LteSampler(this, serviceScope))
+        set.add(WifiRoamSampler(this, serviceScope))
     }
 
 
