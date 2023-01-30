@@ -5,4 +5,6 @@ class WifiSignalStrengthLog(
     signalStrength: Int,
 ) : SignalStrengthLog(timestamp, signalStrength) {
     override val signalName: String = "Wifi"
+
+
 }

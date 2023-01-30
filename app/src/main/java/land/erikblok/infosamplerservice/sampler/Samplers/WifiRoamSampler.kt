@@ -5,9 +5,9 @@ import android.content.Context.WIFI_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.NetworkInfo
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
-import android.net.wifi.WifiManager.EXTRA_NETWORK_INFO
-import android.net.wifi.WifiManager.NETWORK_STATE_CHANGED_ACTION
+import android.net.wifi.WifiManager.*
 import android.os.SystemClock
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
@@ -27,9 +27,14 @@ class WifiRoamSampler(ctx: Context, samplerScope: CoroutineScope) : IntentSample
 
     override val intentFilter: IntentFilter = IntentFilter(NETWORK_STATE_CHANGED_ACTION)
     override fun createLog(intent: Intent): SamplerLog? {
-        val wifiInfo = wifiMan.connectionInfo
-        wifiInfo?.let{wi ->
-            Log.d(TAG, wi.supplicantState.toString())
+        //filter intents received before connection.
+        intent.getParcelableExtra<NetworkInfo>(EXTRA_NETWORK_INFO)?.let{
+            if(it.state != NetworkInfo.State.CONNECTED) return@createLog null
+        }
+
+        //I think there is no guarantee that we will have fully updated bssid here... but it seems
+        //that this is the best we can do until android 12 when google fixes their API
+        wifiMan.connectionInfo?.let{wi ->
             val newBssid = wi.bssid ?: "invalid"
             if(newBssid != lastBssid){
                 lastBssid = newBssid
