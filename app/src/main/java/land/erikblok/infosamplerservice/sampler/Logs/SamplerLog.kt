@@ -6,6 +6,10 @@ open class SamplerLog(val timestamp: Long){
     }
     open fun getData() : String = ""
 
+    open fun getSimpleString() : String {
+        return "$timestamp"
+    }
+
     constructor() : this(-1){
 
     }

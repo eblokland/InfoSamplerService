@@ -9,6 +9,10 @@ abstract class SignalStrengthLog(timestamp: Long, val signalStrength : Int) : Sa
         return "${super.toString()} Signal strength of ${signalName} now ${signalStrength}"
     }
 
+    override fun getSimpleString(): String {
+        return "${super.getSimpleString()} $signalName $signalStrength"
+    }
+
     override fun getData(): String {
         return "$signalName strength: $signalStrength"
     }

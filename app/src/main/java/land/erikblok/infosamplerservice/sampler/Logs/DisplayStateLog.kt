@@ -21,6 +21,10 @@ class DisplayStateLog(timestamp: Long, private val state : Int, private val disp
         }
     }
 
+    override fun getSimpleString(): String {
+        return "${super.getSimpleString()} displaystate $displayId $state"
+    }
+
     override fun getData(): String {
         return "Display $displayId state ${stateToString(state)}"
     }

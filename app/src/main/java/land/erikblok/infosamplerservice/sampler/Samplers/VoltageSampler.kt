@@ -17,12 +17,18 @@ class VoltageSampler(ctx: Context, samplerScope: CoroutineScope) : IntentSampler
     ctx,
     samplerScope
 ) {
+    private var lastVoltage : Int = -1
     override val intentFilter: IntentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-    override fun createLog(intent: Intent): SamplerLog {
-        return VoltageLog(
-            SystemClock.elapsedRealtimeNanos(),
-            intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
-        )
+    override fun createLog(intent: Intent): SamplerLog? {
+        val voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
+        if(voltage != lastVoltage){
+            lastVoltage = voltage;
+            return VoltageLog(
+                SystemClock.elapsedRealtimeNanos(),
+                voltage
+                )
+        }
+        return null
     }
 
 }

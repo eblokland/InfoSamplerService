@@ -22,11 +22,16 @@ class LogFileWriter(outputFile: File) : BaseLogReceiver() {
     constructor(filePath: String) : this(File(filePath))
 
     override fun RecordLog(samplerLog: SamplerLog) {
-        if(isClosed) return;
-        fileWriter.write(samplerLog.toString());
+        if (isClosed) return;
+        fileWriter.write("${samplerLog.getSimpleString()}\n");
     }
 
-    override fun onDestroy(){
+    override fun onDestroy() {
+        try {
+            fileWriter.flush()
+        } catch (e: IOException) {
+            Log.w(TAG, "Failed to flush filewriter on close :(", e)
+        }
         fileWriter.close()
         isClosed = true
     }

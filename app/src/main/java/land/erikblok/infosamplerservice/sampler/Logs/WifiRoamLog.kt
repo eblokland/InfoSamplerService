@@ -5,6 +5,10 @@ class WifiRoamLog(timestamp: Long, val bssid : String) : SamplerLog(timestamp) {
         return "${super.toString()} roamed to AP $bssid"
     }
 
+    override fun getSimpleString(): String {
+        return "${super.getSimpleString()} wifiRoam $bssid"
+    }
+
     override fun getData(): String {
         return bssid
     }

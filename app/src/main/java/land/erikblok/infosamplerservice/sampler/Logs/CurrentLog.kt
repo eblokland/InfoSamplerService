@@ -9,4 +9,8 @@ class CurrentLog(timestamp: Long, val current : Int) : SamplerLog(timestamp) {
     override fun getData(): String {
         return "Battery current: $current"
     }
+
+    override fun getSimpleString(): String {
+        return "${super.getSimpleString()} current $current"
+    }
 }
