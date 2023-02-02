@@ -53,6 +53,7 @@
                 <action android:name="land.erikblok.action.WRITETOLOGCAT" />
             </intent-filter>
         </service>
+        <profileable android:shell="true" android:enabled="true"/>
     </application>
 
 </manifest>

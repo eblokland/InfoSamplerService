@@ -1,12 +1,18 @@
 package land.erikblok.infosamplerservice
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationChannel.DEFAULT_CHANNEL_ID
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_MAIN
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.net.toFile
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -34,6 +40,8 @@ class EnvironmentSampler : Service() {
     private var logcatId = -1;
     private var keepaliveId = -1;
 
+    private var foregroundRunning = false;
+
 
     private val dirtyHardcodedFilePath = "/data/local/tmp/logs.txt"
     private val TAG = "SAMPLER_SERVICE"
@@ -42,6 +50,15 @@ class EnvironmentSampler : Service() {
     private lateinit var logcatLoggerScope: CoroutineScope
     private val serviceScope: CoroutineScope =
         CoroutineScope(SupervisorJob() + Dispatchers.Default) //scope for running the samplers, etc.  Will be kept alive until the service is killed.
+
+    private lateinit var nc: NotificationChannel
+
+    init {
+        if (Build.VERSION.SDK_INT >= 26) {
+            nc = NotificationChannel("svc", "SamplerService", NotificationManager.IMPORTANCE_LOW)
+        }
+    }
+
 
     inner class SamplerBinder : Binder() {
         fun getService(): EnvironmentSampler = this@EnvironmentSampler
@@ -64,19 +81,31 @@ class EnvironmentSampler : Service() {
             when (intent.action) {
                 ACTION_WRITETOLOGCAT -> runLogcatLogger(startId)
                 ACTION_WRITETOFILE -> runFileLogger(startId, intent)
-                ACTION_NOWRITE, ACTION_MAIN ->  keepaliveId = startId
+                ACTION_NOWRITE, ACTION_MAIN -> keepaliveId = startId
                 // this is stupid but maybe the best way to send commands via adb
                 //always consider stop actions as failed
                 ACTION_STOPFILE -> stopFileLogger()
                 ACTION_STOPLOGCAT -> stopLogcat()
                 ACTION_NOKEEPALIVE -> keepaliveId = -1
-                else ->  false
+                else -> false
             }
         }
 
         //go ahead and stop if we don't have any active things.
-        if(logcatId == -1 && loggerId == -1 && keepaliveId == -1){
+        if (logcatId == -1 && loggerId == -1 && keepaliveId == -1) {
             stopSelf()
+        } else if(!foregroundRunning) {
+            if (Build.VERSION.SDK_INT >= 26) (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
+                nc
+            )
+            val nb = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(
+                this,
+                nc.id
+            ) else Notification.Builder(this)
+            nb.setContentText("hello i am sampling")
+            val not = nb.build()
+            startForeground(startId, not)
+            foregroundRunning = true
         }
         //at this point don't bother restarting the service if it gets killed for oom
         return START_NOT_STICKY
@@ -111,12 +140,13 @@ class EnvironmentSampler : Service() {
     }
 
     fun stopLogcat() {
-        if(logcatId == -1) return
+        if (logcatId == -1) return
         logcatLoggerScope.cancel()
         logcatId = -1
     }
-    fun stopFileLogger(){
-        if(loggerId == -1) return
+
+    fun stopFileLogger() {
+        if (loggerId == -1) return
         if (this::fileWriter.isInitialized) fileWriter.onDestroy()
         textLoggerScope.cancel()
         loggerId = -1;
@@ -172,7 +202,6 @@ class EnvironmentSampler : Service() {
     //region PRIVATE_HELPERS
 
 
-
     private fun setupSamplers(set: MutableSet<BaseSampler>) {
         set.add(
             CurrentSampler(
@@ -181,13 +210,17 @@ class EnvironmentSampler : Service() {
             )
         ) //pass context of service to sampler, make sure this is not called before onStart
         set.add(VoltageSampler(this, serviceScope))
-        set.add(DisplayManagerSampler(this, serviceScope))
+        if (android.os.Build.VERSION.SDK_INT >= 29) set.add(
+            DisplayManagerSampler(
+                this,
+                serviceScope
+            )
+        )
         set.add(LteSampler(this, serviceScope))
         set.add(WifiRoamSampler(this, serviceScope))
         set.add(WifiStrSampler(this, serviceScope))
         set.add(DisplayBrightnessSampler(this, serviceScope))
     }
-
 
 
     //endregion
