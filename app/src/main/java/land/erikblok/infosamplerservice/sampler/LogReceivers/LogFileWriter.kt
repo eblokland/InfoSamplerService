@@ -17,6 +17,7 @@ class LogFileWriter(outputFile: File) : BaseLogReceiver() {
         if (!outputFile.exists()) outputFile.createNewFile()
         check(outputFile.canWrite())
         fileWriter = FileWriter(outputFile)
+        fileWriter.write("INIT FILE\n")
     }
 
     constructor(filePath: String) : this(File(filePath))

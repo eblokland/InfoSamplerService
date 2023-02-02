@@ -69,6 +69,7 @@ class EnvironmentSampler : Service() {
     override fun onCreate() {
         Log.d(TAG, "called oncreate")
         samplers = LinkedHashSet()
+        setForeground()
         setupSamplers(samplers)
         textLoggerScope =
             CoroutineScope(Job() + Dispatchers.Default) //is job() the best way to do this?
@@ -77,6 +78,7 @@ class EnvironmentSampler : Service() {
     //for now this will just ignore multiple starts, so don't do that.
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "called onstart")
+        setForeground()
         intent?.let {
             when (intent.action) {
                 ACTION_WRITETOLOGCAT -> runLogcatLogger(startId)
@@ -94,18 +96,6 @@ class EnvironmentSampler : Service() {
         //go ahead and stop if we don't have any active things.
         if (logcatId == -1 && loggerId == -1 && keepaliveId == -1) {
             stopSelf()
-        } else if(!foregroundRunning) {
-            if (Build.VERSION.SDK_INT >= 26) (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
-                nc
-            )
-            val nb = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(
-                this,
-                nc.id
-            ) else Notification.Builder(this)
-            nb.setContentText("hello i am sampling")
-            val not = nb.build()
-            startForeground(startId, not)
-            foregroundRunning = true
         }
         //at this point don't bother restarting the service if it gets killed for oom
         return START_NOT_STICKY
@@ -115,6 +105,7 @@ class EnvironmentSampler : Service() {
     override fun onDestroy() {
         stopLogcat()
         stopFileLogger()
+        foregroundRunning = false
         serviceScope.cancel()
         //manually destroy samplers because we have no guarantee that cancel runs before the service is destroyed :(
         samplers.forEach { if (it is DestructableSampler) it.onDestroy() }
@@ -200,6 +191,25 @@ class EnvironmentSampler : Service() {
     //endregion
 
     //region PRIVATE_HELPERS
+
+    private fun setForeground(){
+        if(!foregroundRunning) {
+            val notman = (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
+            if (Build.VERSION.SDK_INT >= 26) notman.createNotificationChannel(
+                nc
+            )
+            val nb = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(
+                this,
+                nc.id
+            ) else Notification.Builder(this)
+            nb.setContentText("hello i am sampling")
+            nb.setSmallIcon(R.drawable.default_notification)
+            val not = nb.build()
+            notman.notify(1234, not)
+            startForeground(1234, not)
+            foregroundRunning = true
+        }
+    }
 
 
     private fun setupSamplers(set: MutableSet<BaseSampler>) {
