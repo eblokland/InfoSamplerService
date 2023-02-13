@@ -38,7 +38,7 @@ class WifiRoamSampler(ctx: Context, samplerScope: CoroutineScope) : IntentSample
             val newBssid = wi.bssid ?: "invalid"
             if(newBssid != lastBssid){
                 lastBssid = newBssid
-                return WifiRoamLog(SystemClock.elapsedRealtimeNanos(), newBssid)
+                return WifiRoamLog(SystemClock.uptimeMillis(), newBssid)
             }
         }
         return null

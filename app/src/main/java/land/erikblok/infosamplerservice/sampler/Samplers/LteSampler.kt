@@ -40,7 +40,7 @@ class LteSampler(ctx: Context, samplerScope: CoroutineScope) : BaseSampler(ctx, 
                     override fun onSignalStrengthsChanged(signalStrength: SignalStrength?) {
                         signalStrength?.let {
                             trySendBlocking(
-                                CellularSignalStrengthLog(SystemClock.elapsedRealtimeNanos(), it.level)
+                                CellularSignalStrengthLog(SystemClock.uptimeMillis(), it.level)
                             ).onFailure { Log.d(TAG, "Failed to send cell strength log") }
                         }
                     }

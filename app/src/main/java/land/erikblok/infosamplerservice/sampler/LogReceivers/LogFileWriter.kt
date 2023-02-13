@@ -23,7 +23,10 @@ class LogFileWriter(outputFile: File) : BaseLogReceiver() {
     constructor(filePath: String) : this(File(filePath))
 
     override fun RecordLog(samplerLog: SamplerLog) {
-        if (isClosed) return;
+        if (isClosed){
+            Log.d(TAG, "tried to record log after closing the writer.")
+            return
+        };
         fileWriter.write("${samplerLog.getSimpleString()}\n");
     }
 

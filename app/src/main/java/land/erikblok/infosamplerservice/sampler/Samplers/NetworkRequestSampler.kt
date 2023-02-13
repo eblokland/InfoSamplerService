@@ -47,7 +47,7 @@ class NetworkRequestSampler(ctx: Context, samplerScope: CoroutineScope) : BaseSa
                 if(wifiInfo is WifiInfo){
                     Log.i(TAG, "???")
                     trySendBlocking(
-                        WifiRoamLog(SystemClock.elapsedRealtimeNanos(), wifiInfo.bssid)
+                        WifiRoamLog(SystemClock.uptimeMillis(), wifiInfo.bssid)
                     ).onFailure { Log.d(TAG,"Failed to send wifi roam log") }
                 }
                 else{

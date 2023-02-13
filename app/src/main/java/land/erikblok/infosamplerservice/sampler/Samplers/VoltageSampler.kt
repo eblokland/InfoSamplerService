@@ -24,7 +24,7 @@ class VoltageSampler(ctx: Context, samplerScope: CoroutineScope) : IntentSampler
         if(voltage != lastVoltage){
             lastVoltage = voltage;
             return VoltageLog(
-                SystemClock.elapsedRealtimeNanos(),
+                SystemClock.uptimeMillis(),
                 voltage
                 )
         }

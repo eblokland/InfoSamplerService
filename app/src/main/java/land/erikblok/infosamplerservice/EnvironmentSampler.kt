@@ -71,8 +71,6 @@ class EnvironmentSampler : Service() {
         samplers = LinkedHashSet()
         setForeground()
         setupSamplers(samplers)
-        textLoggerScope =
-            CoroutineScope(Job() + Dispatchers.Default) //is job() the best way to do this?
     }
 
     //for now this will just ignore multiple starts, so don't do that.
@@ -137,14 +135,22 @@ class EnvironmentSampler : Service() {
     }
 
     fun stopFileLogger() {
-        if (loggerId == -1) return
+        if (loggerId == -1) {
+            Log.d(TAG, "Tried to stop a logger that doesn't exist?")
+            return
+        }
         if (this::fileWriter.isInitialized) fileWriter.onDestroy()
         textLoggerScope.cancel()
         loggerId = -1;
     }
 
     fun runFileLogger(startId: Int, intent: Intent): Boolean {
-        if (loggerId != -1) return false
+        if (loggerId != -1) {
+            Log.d(TAG, "Didn't start file logger, id was not -1")
+            return false
+        }
+        textLoggerScope =
+            CoroutineScope(Job() + Dispatchers.Default) //is job() the best way to do this?
         val uri = intent.data ?: return false
 
         val file: File
@@ -220,6 +226,7 @@ class EnvironmentSampler : Service() {
             )
         ) //pass context of service to sampler, make sure this is not called before onStart
         set.add(VoltageSampler(this, serviceScope))
+
         if (android.os.Build.VERSION.SDK_INT >= 29) set.add(
             DisplayManagerSampler(
                 this,

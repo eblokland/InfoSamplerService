@@ -50,7 +50,7 @@ class DisplayManagerSampler(ctx: Context, samplerScope: CoroutineScope) : BaseSa
                     stateMap[displayId] = state
                     trySendBlocking(
                         DisplayStateLog(
-                            SystemClock.elapsedRealtimeNanos(),
+                            SystemClock.uptimeMillis(),
                             state,
                             displayId
                         )
@@ -64,7 +64,7 @@ class DisplayManagerSampler(ctx: Context, samplerScope: CoroutineScope) : BaseSa
         dm.displays.forEach {
             trySendBlocking(
                 DisplayStateLog(
-                    SystemClock.elapsedRealtimeNanos(),
+                    SystemClock.uptimeMillis(),
                     it.state,
                     it.displayId
                 )

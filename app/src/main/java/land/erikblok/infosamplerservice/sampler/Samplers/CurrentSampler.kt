@@ -24,6 +24,6 @@ class CurrentSampler(ctx: Context, samplerScope: CoroutineScope) : PollingSample
 
 
     override fun createLog(sample: Int) : SamplerLog{
-        return CurrentLog(SystemClock.elapsedRealtimeNanos(), sample)
+        return CurrentLog(SystemClock.uptimeMillis(), sample)
     }
 }

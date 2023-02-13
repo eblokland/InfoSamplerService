@@ -20,7 +20,7 @@ class WifiStrSampler(ctx: Context, samplerScope: CoroutineScope) : IntentSampler
     override fun createLog(intent: Intent): SamplerLog? {
         val rssi = intent.getIntExtra(EXTRA_NEW_RSSI, 1)
         if(rssi != 1){
-            return WifiSignalStrengthLog(SystemClock.elapsedRealtimeNanos(), rssi)
+            return WifiSignalStrengthLog(SystemClock.uptimeMillis(), rssi)
         }
         return null
     }

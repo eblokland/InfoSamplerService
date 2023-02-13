@@ -30,13 +30,13 @@ class DisplayBrightnessSampler(ctx: Context, samplerScope: CoroutineScope) : Bas
             override fun onChange(selfchange: Boolean){
                 val newBrightness = settingFun()
                 trySendBlocking(
-                    DisplayBrightnessLog(SystemClock.elapsedRealtimeNanos(), newBrightness)
+                    DisplayBrightnessLog(SystemClock.uptimeMillis(), newBrightness)
                 ).onFailure { Log.d(TAG, "failed to send brightness sample") }
             }
         }
         ctx.contentResolver.registerContentObserver(Settings.System.getUriFor(settingString), false, co)
         //send initial state
-        trySendBlocking(DisplayBrightnessLog(SystemClock.elapsedRealtimeNanos(), settingFun()))
+        trySendBlocking(DisplayBrightnessLog(SystemClock.uptimeMillis(), settingFun()))
 
         awaitClose{
             ctx.contentResolver.unregisterContentObserver(co)
