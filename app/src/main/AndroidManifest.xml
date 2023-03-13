@@ -34,13 +34,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".DebugDisplay"
-            android:exported="true"
-            android:label="@string/title_activity_debug_display"
-            android:theme="@style/Theme.InfoSamplerService.NoActionBar">
-
-        </activity>
 
         <service
             android:name=".EnvironmentSampler"
