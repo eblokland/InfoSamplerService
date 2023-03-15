@@ -42,8 +42,6 @@ class EnvironmentSampler : Service() {
 
     private var foregroundRunning = false;
 
-
-    private val dirtyHardcodedFilePath = "/data/local/tmp/logs.txt"
     private val TAG = "SAMPLER_SERVICE"
 
     private lateinit var textLoggerScope: CoroutineScope
