@@ -22,7 +22,6 @@ class CurrentSampler(ctx: Context, samplerScope: CoroutineScope) : PollingSample
         funToSample = {   batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW) }
     }
 
-
     override fun createLog(sample: Int) : SamplerLog{
         return CurrentLog(SystemClock.uptimeMillis(), sample)
     }

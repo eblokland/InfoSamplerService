@@ -30,6 +30,7 @@ const val ACTION_NOWRITE = "land.erikblok.action.NOWRITE"
 const val ACTION_STOPFILE = "land.erikblok.action.STOPFILE"
 const val ACTION_STOPLOGCAT = "land.erikblok.action.STOPLOGCAT"
 const val ACTION_NOKEEPALIVE = "land.erikblok.action.NOKEEPALIVE"
+const val SERVICE_PKG = "land.erikblok.infosamplerservice/.EnvironmentSampler"
 
 class EnvironmentSampler : Service() {
 

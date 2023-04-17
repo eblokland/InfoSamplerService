@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.ComponentActivity
@@ -14,9 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -92,14 +91,37 @@ fun Greeting(name: String) {
 }
 
 @Composable
-fun MainLayout(statsList : List<SharedFlow<SamplerLog>>){
+fun MainLayout(statsList : List<SharedFlow<SamplerLog>>, ctx: Context? = null){
+    fun stopService(){
+        ctx?.startService(Intent(
+            ctx,
+            EnvironmentSampler::class.java,
+        ).apply{
+            this.action = ACTION_STOPLOGCAT
+        })
+        ctx?.startService(Intent(
+            ctx,
+            EnvironmentSampler::class.java,
+        ).apply{
+            this.action = ACTION_STOPFILE
+        })
+    }
+
+
     InfoSamplerServiceTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            flowList(statsList)
+            Column() {
+                Button(
+                    onClick = { stopService() },
+                    content = { Text("Stop running logs") },
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+                    flowList(statsList)
+            }
         }
     }
 }
